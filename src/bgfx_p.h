@@ -225,6 +225,7 @@ namespace stl = std;
 #define BGFX_RENDERER_METAL_NAME      "Metal"
 #define BGFX_RENDERER_VULKAN_NAME     "Vulkan"
 #define BGFX_RENDERER_GNM_NAME        "GNM"
+#define BGFX_RENDERER_GXM_NAME		  "GXM"
 #define BGFX_RENDERER_NOOP_NAME       "Noop"
 
 #if BGFX_CONFIG_RENDERER_OPENGL
@@ -2536,7 +2537,7 @@ namespace bgfx
 
 		uint64_t alloc(uint32_t _size)
 		{
-			_size = bx::max(_size, 16u);
+			_size = bx::max(_size, (uint32_t)16u);
 
 			for (FreeList::iterator it = m_free.begin(), itEnd = m_free.end(); it != itEnd; ++it)
 			{
@@ -2738,8 +2739,8 @@ namespace bgfx
 				, _height
 				);
 			m_init.resolution.format = TextureFormat::Count != _format ? _format : m_init.resolution.format;
-			m_init.resolution.width  = bx::clamp(_width,  1u, g_caps.limits.maxTextureSize);
-			m_init.resolution.height = bx::clamp(_height, 1u, g_caps.limits.maxTextureSize);
+			m_init.resolution.width  = bx::clamp(_width,  (uint32_t)1u, g_caps.limits.maxTextureSize);
+			m_init.resolution.height = bx::clamp(_height, (uint32_t)1u, g_caps.limits.maxTextureSize);
 			m_init.resolution.reset  = 0
 				| _flags
 				| (g_platformDataChangedSinceReset ? BGFX_RESET_INTERNAL_FORCE : 0)

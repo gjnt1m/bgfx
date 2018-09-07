@@ -997,9 +997,9 @@ namespace bgfx
 
 		m_compute.m_startMatrix = m_draw.m_startMatrix;
 		m_compute.m_numMatrices = m_draw.m_numMatrices;
-		m_compute.m_numX   = bx::max(_numX, 1u);
-		m_compute.m_numY   = bx::max(_numY, 1u);
-		m_compute.m_numZ   = bx::max(_numZ, 1u);
+		m_compute.m_numX   = bx::max(_numX, (uint32_t)1u);
+		m_compute.m_numY   = bx::max(_numY, (uint32_t)1u);
+		m_compute.m_numZ   = bx::max(_numZ, (uint32_t)1u);
 		m_compute.m_submitFlags = _flags;
 
 		m_key.m_program = _handle.idx;
@@ -2074,6 +2074,7 @@ namespace bgfx
 		{ d3d11::rendererCreate, d3d11::rendererDestroy, BGFX_RENDERER_DIRECT3D11_NAME, !!BGFX_CONFIG_RENDERER_DIRECT3D11 }, // Direct3D11
 		{ d3d12::rendererCreate, d3d12::rendererDestroy, BGFX_RENDERER_DIRECT3D12_NAME, !!BGFX_CONFIG_RENDERER_DIRECT3D12 }, // Direct3D12
 		{ gnm::rendererCreate,   gnm::rendererDestroy,   BGFX_RENDERER_GNM_NAME,        !!BGFX_CONFIG_RENDERER_GNM        }, // GNM
+		{ noop::rendererCreate,  noop::rendererDestroy,  BGFX_RENDERER_GXM_NAME,        !!BGFX_CONFIG_RENDERER_GXM }, // GXM
 #if BX_PLATFORM_OSX || BX_PLATFORM_IOS
 		{ mtl::rendererCreate,   mtl::rendererDestroy,   BGFX_RENDERER_METAL_NAME,      !!BGFX_CONFIG_RENDERER_METAL      }, // Metal
 #else
