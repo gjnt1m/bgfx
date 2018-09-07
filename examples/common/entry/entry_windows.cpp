@@ -8,7 +8,7 @@
 #if ENTRY_CONFIG_USE_NATIVE && BX_PLATFORM_WINDOWS
 
 #include <bgfx/platform.h>
-
+#include <bx/config.h>
 #include <bx/mutex.h>
 #include <bx/handlealloc.h>
 #include <bx/os.h>
@@ -351,6 +351,9 @@ namespace entry
 	}
 
 	struct Context
+#if !BX_CONFIG_SUPPORTS_THREADING
+		: public entry::PlatformCallback
+
 	{
 		Context()
 			: m_mz(0)
@@ -359,6 +362,8 @@ namespace entry
 			, m_init(false)
 			, m_exit(false)
 		{
+			PlatformCallback::s_singleton = this;
+
 			bx::memSet(s_translateKey, 0, sizeof(s_translateKey) );
 			s_translateKey[VK_ESCAPE]     = Key::Esc;
 			s_translateKey[VK_RETURN]     = Key::Return;
@@ -448,6 +453,30 @@ namespace entry
 			s_translateKey[uint8_t('Z')]  = Key::KeyZ;
 		}
 
+		void init(AppI* _app)
+		{
+			m_init = true;
+
+			m_eventQueue.postSizeEvent(findHandle(m_hwnd[0]), m_width, m_height);
+		}
+
+		bool update(AppI* _app)
+		{
+			static MSG msg;
+
+			s_xinput.update(m_eventQueue);
+			WaitForInputIdle(GetCurrentProcess(), 16);
+			while (0 != PeekMessage(&msg, NULL, 0U, 0U, PM_REMOVE))
+			{
+				TranslateMessage(&msg);
+				DispatchMessage(&msg);
+			}
+
+			return 0;
+		}
+#else
+	{
+#endif
 		int32_t run(int _argc, const char* const* _argv)
 		{
 			SetDllDirectoryA(".");
@@ -499,6 +528,7 @@ namespace entry
 			m_oldWidth  = ENTRY_DEFAULT_WIDTH;
 			m_oldHeight = ENTRY_DEFAULT_HEIGHT;
 
+#if BX_CONFIG_SUPPORTS_THREADING
 			MainThreadEntry mte;
 			mte.m_argc = _argc;
 			mte.m_argv = _argv;
@@ -520,7 +550,6 @@ namespace entry
 
 				s_xinput.update(m_eventQueue);
 				WaitForInputIdle(GetCurrentProcess(), 16);
-
 				while (0 != PeekMessage(&msg, NULL, 0U, 0U, PM_REMOVE) )
 				{
 					TranslateMessage(&msg);
@@ -537,6 +566,12 @@ namespace entry
 			s_xinput.shutdown();
 
 			return thread.getExitCode();
+#else
+
+			int32_t result = main(_argc, _argv);
+
+			return 0;
+#endif
 		}
 
 		LRESULT process(HWND _hwnd, UINT _id, WPARAM _wparam, LPARAM _lparam)
@@ -881,7 +916,9 @@ namespace entry
 
 		WindowHandle findHandle(HWND _hwnd)
 		{
+#if BX_CONFIG_SUPPORTS_THREADING
 			bx::MutexScope scope(m_lock);
+#endif
 			for (uint16_t ii = 0, num = m_windowAlloc.getNumHandles(); ii < num; ++ii)
 			{
 				uint16_t idx = m_windowAlloc.getHandleAt(ii);
@@ -1014,8 +1051,9 @@ namespace entry
 		static LRESULT CALLBACK wndProc(HWND _hwnd, UINT _id, WPARAM _wparam, LPARAM _lparam);
 
 		EventQueue m_eventQueue;
+#if BX_CONFIG_SUPPORTS_THREADING
 		bx::Mutex m_lock;
-
+#endif
 		bx::HandleAllocT<ENTRY_CONFIG_MAX_WINDOWS> m_windowAlloc;
 
 		HWND m_hwnd[ENTRY_CONFIG_MAX_WINDOWS];
@@ -1065,7 +1103,9 @@ namespace entry
 
 	WindowHandle createWindow(int32_t _x, int32_t _y, uint32_t _width, uint32_t _height, uint32_t _flags, const char* _title)
 	{
+#if BX_CONFIG_SUPPORTS_THREADING
 		bx::MutexScope scope(s_ctx.m_lock);
+#endif
 		WindowHandle handle = { s_ctx.m_windowAlloc.alloc() };
 
 		if (UINT16_MAX != handle.idx)
@@ -1089,7 +1129,9 @@ namespace entry
 		{
 			PostMessage(s_ctx.m_hwnd[0], WM_USER_WINDOW_DESTROY, _handle.idx, 0);
 
+#if BX_CONFIG_SUPPORTS_THREADING
 			bx::MutexScope scope(s_ctx.m_lock);
+#endif
 			s_ctx.m_windowAlloc.free(_handle.idx);
 		}
 	}

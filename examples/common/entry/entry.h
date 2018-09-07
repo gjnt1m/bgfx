@@ -10,6 +10,7 @@
 #include <bx/bx.h>
 #include <bx/filepath.h>
 #include <bx/string.h>
+#include <vector>
 
 namespace bx { struct FileReaderI; struct FileWriterI; struct AllocatorI; }
 
@@ -313,6 +314,35 @@ namespace entry
 	};
 
 	///
+	class BX_NO_VTABLE PlatformCallback
+	{
+	protected:
+		static PlatformCallback* s_singleton;
+
+		PlatformCallback() {};
+
+	public:
+		static PlatformCallback* getInstance();
+
+		virtual void init(AppI* _app)
+		{
+			BX_UNUSED(_app)
+		}
+
+		virtual bool update(AppI* _app)
+		{
+			BX_UNUSED(_app)
+			return true;
+		}
+
+		virtual int shutdown(AppI* _app)
+		{
+			BX_UNUSED(_app)
+			return 0;
+		}
+	};
+
+	///
 	AppI* getFirstApp();
 
 	///
@@ -320,7 +350,6 @@ namespace entry
 
 	///
 	int runApp(AppI* _app, int _argc, const char* const* _argv);
-
 } // namespace entry
 
 #endif // ENTRY_H_HEADER_GUARD

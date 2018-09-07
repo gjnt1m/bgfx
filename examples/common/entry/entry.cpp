@@ -38,6 +38,14 @@ namespace entry
 
 	static String s_currentDir;
 
+	PlatformCallback* PlatformCallback::s_singleton = NULL;
+
+	PlatformCallback* PlatformCallback::getInstance()
+	{
+		if (!s_singleton) s_singleton = new PlatformCallback();
+		return s_singleton;
+	}
+
 	class FileReader : public bx::FileReader
 	{
 		typedef bx::FileReader super;
@@ -508,6 +516,9 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 	int runApp(AppI* _app, int _argc, const char* const* _argv)
 	{
 		_app->init(_argc, _argv, s_width, s_height);
+
+		PlatformCallback::getInstance()->init(_app);
+
 		bgfx::frame();
 
 		WindowHandle defaultWindow = { 0 };
@@ -519,14 +530,18 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 #else
 		while (_app->update() )
 		{
-			if (0 != bx::strLen(s_restartArgs) )
+			PlatformCallback::getInstance()->update(_app);
+
+			if (0 != bx::strLen(s_restartArgs))
 			{
 				break;
 			}
 		}
 #endif // BX_PLATFORM_EMSCRIPTEN
 
-		return _app->shutdown();
+		int res = _app->shutdown();
+		PlatformCallback::getInstance()->shutdown(_app);
+		return res;
 	}
 
 	static int32_t sortApp(const void* _lhs, const void* _rhs)
