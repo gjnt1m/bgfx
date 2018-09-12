@@ -41,7 +41,7 @@ struct CmdContext
 		{
 			char commandLine[1024];
 			uint32_t size = sizeof(commandLine);
-			int argc;
+			int32_t argc;
 			char* argv[64];
 			next = bx::tokenizeCommandLine(_cmd, commandLine, size, argc, argv, BX_COUNTOF(argv), '\n');
 			if (argc > 0)

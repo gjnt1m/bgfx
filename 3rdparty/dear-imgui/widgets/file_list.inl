@@ -16,7 +16,8 @@ namespace ImGui
 
 	void ImFileList::ChDir(const char* path)
 	{
-#if BX_PLATFORM_PS4
+#if BX_PLATFORM_PS4 \
+ || BX_PLATFORM_VITA
 		BX_UNUSED(path);
 #else
 		DIR* dir = opendir(path);

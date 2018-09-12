@@ -16,6 +16,11 @@ namespace bgfx
 
 namespace bgfx { namespace gxm
 {
+    struct GxmDisplayData
+    {
+        void* m_address;
+    }
+    
     struct RendererContextGXM : public RendererContextI
     {
         RendererContextGXM()
@@ -43,9 +48,50 @@ namespace bgfx { namespace gxm
            return false;
         }
 
+        static void gxmDisplayCallback(const void* _data)
+        {
+        }
+        
         bool init(const Init& _init)
         {
-            return true;
+            struct ErrorState
+            {
+                enum Enum
+                {
+                    Default,
+                    SceGxmInitialized
+                };
+            };
+
+            ErrorState::Enum errorState = ErrorState::Default;
+            
+            m_vendor = "Imagination Technologies";
+            
+            m_renderer = "PowerVR SGX543MP4+";
+            
+            g_caps.vendorId = BGFX_PCI_ID_NONE;
+            
+            //Start GXM initialization
+            SceGxmInitializeParams gxmInitParams;
+            memset(&gxmInitParams, 0, sizeof(SceGxmInitializeParams));
+            gxmInitParams.flags = 0;
+            gxmInitParams.displayQueueMaxPendingCount = GXM_DISPLAY_PENDING_COUNT;
+            gxmInitParams.displayQueueCallback = gxmDisplayCallback;
+            gxmInitParams.displayQueueCallbackDataSize = sizeof(struct GxmDisplayData);
+            gxmInitParams.parameterBufferSize = SCE_GXM_DEFAULT_PARAMETER_BUFFER_SIZE;
+            
+            SceInt err = sceGxmInitialize(&gxmInitParams); 
+            
+            if(err != SCE_OK)
+            {
+                BX_TRACE("Failed to initialize GXM");
+                goto error;
+            }
+            
+            errorState = ErrorState::SceGxmInitialized;
+            
+        error:
+            BX_TRACE("errorState %d", errorState);
         }
         
         bool shutdown()
@@ -74,119 +120,119 @@ namespace bgfx { namespace gxm
         {
         }
 
-      void createVertexBuffer(VertexBufferHandle /*_handle*/, const Memory* /*_mem*/, VertexDeclHandle /*_declHandle*/, uint16_t /*_flags*/) override
-      {
-      }
+        void createVertexBuffer(VertexBufferHandle /*_handle*/, const Memory* /*_mem*/, VertexDeclHandle /*_declHandle*/, uint16_t /*_flags*/) override
+        {
+        }
 
-      void destroyVertexBuffer(VertexBufferHandle /*_handle*/) override
-      {
-      }
+        void destroyVertexBuffer(VertexBufferHandle /*_handle*/) override
+        {
+        }
 
-      void createDynamicIndexBuffer(IndexBufferHandle /*_handle*/, uint32_t /*_size*/, uint16_t /*_flags*/) override
-      {
-      }
+        void createDynamicIndexBuffer(IndexBufferHandle /*_handle*/, uint32_t /*_size*/, uint16_t /*_flags*/) override
+        {
+        }
 
-      void updateDynamicIndexBuffer(IndexBufferHandle /*_handle*/, uint32_t /*_offset*/, uint32_t /*_size*/, const Memory* /*_mem*/) override
-      {
-      }
+        void updateDynamicIndexBuffer(IndexBufferHandle /*_handle*/, uint32_t /*_offset*/, uint32_t /*_size*/, const Memory* /*_mem*/) override
+        {
+        }
 
-      void destroyDynamicIndexBuffer(IndexBufferHandle /*_handle*/) override
-      {
-      }
+        void destroyDynamicIndexBuffer(IndexBufferHandle /*_handle*/) override
+        {
+        }
 
-      void createDynamicVertexBuffer(VertexBufferHandle /*_handle*/, uint32_t /*_size*/, uint16_t /*_flags*/) override
-      {
-      }
+        void createDynamicVertexBuffer(VertexBufferHandle /*_handle*/, uint32_t /*_size*/, uint16_t /*_flags*/) override
+        {
+        }
 
-      void updateDynamicVertexBuffer(VertexBufferHandle /*_handle*/, uint32_t /*_offset*/, uint32_t /*_size*/, const Memory* /*_mem*/) override
-      {
-      }
+        void updateDynamicVertexBuffer(VertexBufferHandle /*_handle*/, uint32_t /*_offset*/, uint32_t /*_size*/, const Memory* /*_mem*/) override
+        {
+        }
 
-      void destroyDynamicVertexBuffer(VertexBufferHandle /*_handle*/) override
-      {
-      }
+        void destroyDynamicVertexBuffer(VertexBufferHandle /*_handle*/) override
+        {
+        }
 
-      void createShader(ShaderHandle /*_handle*/, const Memory* /*_mem*/) override
-      {
-      }
+        void createShader(ShaderHandle /*_handle*/, const Memory* /*_mem*/) override
+        {
+        }
 
-      void destroyShader(ShaderHandle /*_handle*/) override
-      {
-      }
+        void destroyShader(ShaderHandle /*_handle*/) override
+        {
+        }
 
-      void createProgram(ProgramHandle /*_handle*/, ShaderHandle /*_vsh*/, ShaderHandle /*_fsh*/) override
-      {
-      }
+        void createProgram(ProgramHandle /*_handle*/, ShaderHandle /*_vsh*/, ShaderHandle /*_fsh*/) override
+        {
+        }
 
-      void destroyProgram(ProgramHandle /*_handle*/) override
-      {
-      }
+        void destroyProgram(ProgramHandle /*_handle*/) override
+        {
+        }
 
-      void* createTexture(TextureHandle /*_handle*/, const Memory* /*_mem*/, uint64_t /*_flags*/, uint8_t /*_skip*/) override
-      {
-         return NULL;
-      }
+        void* createTexture(TextureHandle /*_handle*/, const Memory* /*_mem*/, uint64_t /*_flags*/, uint8_t /*_skip*/) override
+        {
+            return NULL;
+        }
 
-      void updateTextureBegin(TextureHandle /*_handle*/, uint8_t /*_side*/, uint8_t /*_mip*/) override
-      {
-      }
+        void updateTextureBegin(TextureHandle /*_handle*/, uint8_t /*_side*/, uint8_t /*_mip*/) override
+        {
+        }
 
-      void updateTexture(TextureHandle /*_handle*/, uint8_t /*_side*/, uint8_t /*_mip*/, const Rect& /*_rect*/, uint16_t /*_z*/, uint16_t /*_depth*/, uint16_t /*_pitch*/, const Memory* /*_mem*/) override
-      {
-      }
+        void updateTexture(TextureHandle /*_handle*/, uint8_t /*_side*/, uint8_t /*_mip*/, const Rect& /*_rect*/, uint16_t /*_z*/, uint16_t /*_depth*/, uint16_t /*_pitch*/, const Memory* /*_mem*/) override
+        {
+        }
 
-      void updateTextureEnd() override
-      {
-      }
+        void updateTextureEnd() override
+        {
+        }
 
-      void readTexture(TextureHandle /*_handle*/, void* /*_data*/, uint8_t /*_mip*/) override
-      {
-      }
+        void readTexture(TextureHandle /*_handle*/, void* /*_data*/, uint8_t /*_mip*/) override
+        {
+        }
 
-      void resizeTexture(TextureHandle /*_handle*/, uint16_t /*_width*/, uint16_t /*_height*/, uint8_t /*_numMips*/) override
-      {
-      }
+        void resizeTexture(TextureHandle /*_handle*/, uint16_t /*_width*/, uint16_t /*_height*/, uint8_t /*_numMips*/) override
+        {
+        }
 
-      void overrideInternal(TextureHandle /*_handle*/, uintptr_t /*_ptr*/) override
-      {
-      }
+        void overrideInternal(TextureHandle /*_handle*/, uintptr_t /*_ptr*/) override
+        {
+        }
 
-      uintptr_t getInternal(TextureHandle /*_handle*/) override
-      {
-         return 0;
-      }
+        uintptr_t getInternal(TextureHandle /*_handle*/) override
+        {
+            return 0;
+        }
 
-      void destroyTexture(TextureHandle /*_handle*/) override
-      {
-      }
+        void destroyTexture(TextureHandle /*_handle*/) override
+        {
+        }
 
-      void createFrameBuffer(FrameBufferHandle /*_handle*/, uint8_t /*_num*/, const Attachment* /*_attachment*/) override
-      {
-      }
+        void createFrameBuffer(FrameBufferHandle /*_handle*/, uint8_t /*_num*/, const Attachment* /*_attachment*/) override
+        {
+        }
 
-      void createFrameBuffer(FrameBufferHandle /*_handle*/, void* /*_nwh*/, uint32_t /*_width*/, uint32_t /*_height*/, TextureFormat::Enum /*_format*/, TextureFormat::Enum /*_depthFormat*/) override
-      {
-      }
+        void createFrameBuffer(FrameBufferHandle /*_handle*/, void* /*_nwh*/, uint32_t /*_width*/, uint32_t /*_height*/, TextureFormat::Enum /*_format*/, TextureFormat::Enum /*_depthFormat*/) override
+        {
+        }
 
-      void destroyFrameBuffer(FrameBufferHandle /*_handle*/) override
-      {
-      }
+        void destroyFrameBuffer(FrameBufferHandle /*_handle*/) override
+        {
+        }
 
-      void createUniform(UniformHandle /*_handle*/, UniformType::Enum /*_type*/, uint16_t /*_num*/, const char* /*_name*/) override
-      {
-      }
+        void createUniform(UniformHandle /*_handle*/, UniformType::Enum /*_type*/, uint16_t /*_num*/, const char* /*_name*/) override
+        {
+        }
 
-      void destroyUniform(UniformHandle /*_handle*/) override
-      {
-      }
+        void destroyUniform(UniformHandle /*_handle*/) override
+        {
+        }
 
-      void requestScreenShot(FrameBufferHandle /*_handle*/, const char* /*_filePath*/) override
-      {
-      }
+        void requestScreenShot(FrameBufferHandle /*_handle*/, const char* /*_filePath*/) override
+        {
+        }
 
-      void updateViewName(ViewId /*_id*/, const char* /*_name*/) override
-      {
-      }
+        void updateViewName(ViewId /*_id*/, const char* /*_name*/) override
+        {
+        }
 
         void updateUniform(uint16_t /*_loc*/, const void* /*_data*/, uint32_t /*_size*/) override
         {
@@ -216,11 +262,15 @@ namespace bgfx { namespace gxm
         {
         }
         
+        const char* m_vendor;
+        const char* m_renderer;
+        
         ShaderGXM m_shaders[BGFX_CONFIG_MAX_SHADERS];
         ProgramGXM m_program[BGFX_CONFIG_MAX_PROGRAMS];
         IndexBufferGXM m_indexBuffers[BGFX_CONFIG_MAX_INDEX_BUFFERS];
         VertexBufferGXM m_vertexBuffers[BGFX_CONFIG_MAX_VERTEX_BUFFERS];
         VertexDecl m_vertexDecls[BGFX_CONFIG_MAX_VERTEX_DECLS];
+        void* m_uniforms[BGFX_CONFIG_MAX_UNIFORMS];
     };
     
     static RendererContextGXM* s_renderGXM;

@@ -14,7 +14,7 @@
 
 namespace bx { struct FileReaderI; struct FileWriterI; struct AllocatorI; }
 
-extern "C" int _main_(int _argc, char** _argv);
+extern "C" int32_t _main_(int32_t _argc, char** _argv);
 
 #define ENTRY_WINDOW_FLAG_NONE         UINT32_C(0x00000000)
 #define ENTRY_WINDOW_FLAG_ASPECT_RATIO UINT32_C(0x00000001)
@@ -26,7 +26,7 @@ extern "C" int _main_(int _argc, char** _argv);
 
 #if ENTRY_CONFIG_IMPLEMENT_MAIN
 #define ENTRY_IMPLEMENT_MAIN(_app, _name, _description) \
-	int _main_(int _argc, char** _argv)                 \
+	int32_t _main_(int32_t _argc, char** _argv)                 \
 	{                                                   \
 			_app app(_name, _description);              \
 			return entry::runApp(&app, _argc, _argv);   \
@@ -314,7 +314,7 @@ namespace entry
 	};
 
 	///
-	class BX_NO_VTABLE PlatformCallback
+	class PlatformCallback
 	{
 	protected:
 		static PlatformCallback* s_singleton;

@@ -29,16 +29,16 @@ Index of this file:
 
 #include <stdio.h>      // vsnprintf, sscanf, printf
 #if !defined(alloca)
-#if defined(__GLIBC__) || defined(__sun) || defined(__CYGWIN__)
-#include <alloca.h>     // alloca (glibc uses <alloca.h>. Note that Cygwin may have _WIN32 defined, so the order matters here)
-#elif defined(_WIN32)
-#include <malloc.h>     // alloca
-#if !defined(alloca)
-#define alloca _alloca  // for clang with MS Codegen
-#endif
-#else
-#include <stdlib.h>     // alloca
-#endif
+#   if defined(__GLIBC__) || defined(__sun) || defined(__CYGWIN__) || defined(__NEW_LIB__) || defined(__vita__)
+#       include <alloca.h>     // alloca (glibc uses <alloca.h>. Note that Cygwin may have _WIN32 defined, so the order matters here)
+#   elif defined(_WIN32)
+#       include <malloc.h>     // alloca
+#       if !defined(alloca)
+#           define alloca _alloca  // for clang with MS Codegen
+#       endif
+#   else
+#       include <stdlib.h>     // alloca
+#   endif
 #endif
 
 // Visual Studio warnings

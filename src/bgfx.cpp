@@ -2056,7 +2056,8 @@ namespace bgfx
 	BGFX_RENDERER_CONTEXT(gl);
 	BGFX_RENDERER_CONTEXT(vk);
 	BGFX_RENDERER_CONTEXT(gnm);
-
+	BGFX_RENDERER_CONTEXT(gxm);
+	
 #undef BGFX_RENDERER_CONTEXT
 
 	struct RendererCreator
@@ -2074,7 +2075,7 @@ namespace bgfx
 		{ d3d11::rendererCreate, d3d11::rendererDestroy, BGFX_RENDERER_DIRECT3D11_NAME, !!BGFX_CONFIG_RENDERER_DIRECT3D11 }, // Direct3D11
 		{ d3d12::rendererCreate, d3d12::rendererDestroy, BGFX_RENDERER_DIRECT3D12_NAME, !!BGFX_CONFIG_RENDERER_DIRECT3D12 }, // Direct3D12
 		{ gnm::rendererCreate,   gnm::rendererDestroy,   BGFX_RENDERER_GNM_NAME,        !!BGFX_CONFIG_RENDERER_GNM        }, // GNM
-		{ noop::rendererCreate,  noop::rendererDestroy,  BGFX_RENDERER_GXM_NAME,        !!BGFX_CONFIG_RENDERER_GXM }, // GXM
+		{ gxm::rendererCreate,   gxm::rendererDestroy,   BGFX_RENDERER_GXM_NAME,        !!BGFX_CONFIG_RENDERER_GXM        }, // GXM
 #if BX_PLATFORM_OSX || BX_PLATFORM_IOS
 		{ mtl::rendererCreate,   mtl::rendererDestroy,   BGFX_RENDERER_METAL_NAME,      !!BGFX_CONFIG_RENDERER_METAL      }, // Metal
 #else
@@ -2273,6 +2274,8 @@ namespace bgfx
 		{
 			uint8_t command;
 			_cmdbuf.read(command);
+
+			BX_TRACE("Exec command: %u", command);
 
 			switch (command)
 			{

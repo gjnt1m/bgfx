@@ -5,12 +5,14 @@
  
 #ifndef BGFX_RENDERER_GXM_H_HEADER_GUARD
 #define BGFX_RENDERER_GXM_H_HEADER_GUARD
+#   include <vitasdk.h>
+
+#   define GXM_DISPLAY_PENDING_COUNT 2
 
 namespace bgfx { namespace gxm {
 
     struct VertexBufferGXM
-    {
-        void create(uint32_t _size, void* _data, VertexDeclHandle _declHandle, uint16_t _flags);
+            void create(uint32_t _size, void* _data, VertexDeclHandle _declHandle, uint16_t _flags);
         
         void update(uint32_t _offset, uint32_t _size, void* _data, bool _discard = false);
         
